@@ -106,14 +106,14 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         if (!code.startsWith('V-') || code.length < 4) {
             codeInput.parentElement.classList.add('error');
-            codeError.textContent = 'Le code doit commencer par V- et contenir au moins 3 caractères.';
+            codeError.textContent = 'Le code doit commencer par V- et contenir 8 chiffres.';
             codeError.classList.add('visible');
             shakeElement(codeInput.parentElement);
             return;
         }
-        if (!/^[V]-[A-Za-z0-9]+$/.test(code)) {
+        if (!/^V-[3-8]{8}$/.test(code)) {
             codeInput.parentElement.classList.add('error');
-            codeError.textContent = 'Format de code invalide. Utilisez le format V-XXXXX.';
+            codeError.textContent = 'Le code doit contenir exactement 8 chiffres (3 à 8). Format : V-XXXXXXXX';
             codeError.classList.add('visible');
             shakeElement(codeInput.parentElement);
             return;
