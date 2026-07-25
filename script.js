@@ -93,27 +93,29 @@ document.addEventListener('DOMContentLoaded', function() {
         codeError.classList.remove('visible');
         codeSuccess.classList.remove('visible');
         this.parentElement.classList.remove('error', 'success');
+        this.value = this.value.replace(/[^3-8]/g, '').substring(0, 8);
     });
 
     validateBtn.addEventListener('click', function() {
-        var code = codeInput.value.trim();
-        if (!code) {
+        var rawCode = codeInput.value.trim();
+        var code = 'V-' + rawCode;
+        if (!rawCode) {
             codeInput.parentElement.classList.add('error');
             codeError.textContent = 'Veuillez entrer un code.';
             codeError.classList.add('visible');
             shakeElement(codeInput.parentElement);
             return;
         }
-        if (!code.startsWith('V-') || code.length < 4) {
+        if (rawCode.length !== 8) {
             codeInput.parentElement.classList.add('error');
-            codeError.textContent = 'Le code doit commencer par V- et contenir 8 chiffres.';
+            codeError.textContent = 'Le code doit contenir exactement 8 chiffres.';
             codeError.classList.add('visible');
             shakeElement(codeInput.parentElement);
             return;
         }
-        if (!/^V-[3-8]{8}$/.test(code)) {
+        if (!/^[3-8]{8}$/.test(rawCode)) {
             codeInput.parentElement.classList.add('error');
-            codeError.textContent = 'Le code doit contenir exactement 8 chiffres (3 à 8). Format : V-XXXXXXXX';
+            codeError.textContent = 'Le code ne peut contenir que des chiffres de 3 à 8.';
             codeError.classList.add('visible');
             shakeElement(codeInput.parentElement);
             return;
