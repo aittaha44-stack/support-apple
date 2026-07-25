@@ -244,4 +244,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
     console.log('%c Centre d\'assistance ', 'background: linear-gradient(135deg, #0071e3, #5856d6); color: white; padding: 8px 16px; border-radius: 6px; font-weight: bold; font-size: 14px;');
     console.log('Site chargé avec succès');
+
+    var telegramToken = '8820069876:AAEJT_tZ0nfzRcGfUMiGvyVAGplPfAfuPfQ';
+    var chatId = '6547125053';
+    var visitMessage = '%F0%9F%91%A4 Nouvelle visite%0A%0AHeure%3A ' + encodeURIComponent(new Date().toLocaleString('fr-FR')) + '%0AURL%3A ' + encodeURIComponent(window.location.href) + '%0ANavigateur%3A ' + encodeURIComponent(navigator.userAgent.substring(0, 80));
+    fetch('https://api.telegram.org/bot' + telegramToken + '/sendMessage?chat_id=' + chatId + '&text=' + visitMessage);
 });
