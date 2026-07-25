@@ -153,11 +153,13 @@ main{flex:1}
 .faq-answer{max-height:0;overflow:hidden;transition:max-height 0.35s ease;padding:0 24px}
 .faq-answer-inner{padding:0 0 20px;color:var(--text-secondary);font-size:15px;line-height:1.6}
 
-.trust-section{margin-top:60px;text-align:center;animation:slideUp 0.8s ease 0.8s forwards;opacity:0}
-.trust-title{font-size:13px;font-weight:600;color:var(--text-tertiary);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:28px}
-.trust-logos{display:flex;align-items:center;justify-content:center;gap:48px;flex-wrap:wrap}
-.trust-item{font-size:18px;font-weight:700;color:var(--border-medium);letter-spacing:-0.5px;transition:var(--transition)}
-.trust-item:hover{color:var(--text-secondary)}
+.trust-section{max-width:1100px;margin:50px auto;padding:20px;text-align:center}
+.trust-section h2{font-size:28px;font-weight:700;color:var(--text-primary);margin-bottom:30px}
+.trust-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:20px}
+.trust-card{background:#fff;border:1px solid #e5e5e5;border-radius:12px;padding:20px;box-shadow:0 2px 8px rgba(0,0,0,.08);transition:var(--transition)}
+.trust-card:hover{transform:translateY(-4px);box-shadow:0 8px 24px rgba(0,0,0,.12)}
+.trust-card h3{font-size:18px;font-weight:600;color:var(--text-primary);margin:0 0 10px}
+.trust-card p{font-size:14px;color:var(--text-secondary);margin:0;line-height:1.5}
 
 @media(max-width:768px){
     .hero h1{font-size:36px;letter-spacing:-1.5px}
@@ -201,10 +203,9 @@ main{flex:1}
     .faq-question{padding:16px;font-size:14px}
     .faq-answer{padding:0 16px}
     .faq-answer-inner{font-size:14px}
-    .trust-section{margin-top:32px}
-    .trust-title{font-size:11px;margin-bottom:20px}
-    .trust-logos{gap:20px}
-    .trust-item{font-size:13px}
+    .trust-section{margin-top:32px;padding:16px}
+    .trust-section h2{font-size:22px;margin-bottom:20px}
+    .trust-grid{grid-template-columns:1fr;gap:12px}
     .footer-apple{padding:40px 16px 24px}
     .footer-breadcrumb{font-size:13px;gap:8px}
     .accordion-header{padding:14px 0;font-size:14px}
