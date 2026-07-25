@@ -144,26 +144,69 @@ main{flex:1}
 .trust-item:hover{color:var(--text-secondary)}
 
 @media(max-width:768px){
-    .hero h1{font-size:44px;letter-spacing:-2px}
-    .hero-subtitle{font-size:17px}
-    .hero{padding:70px 20px 50px}
+    .hero h1{font-size:36px;letter-spacing:-1.5px}
+    .hero-subtitle{font-size:15px}
+    .hero{padding:60px 16px 40px}
     .hero-cta{flex-direction:column;gap:12px}
-    .hero-btn-primary,.hero-btn-secondary{width:100%;justify-content:center}
-    .hero-stats{flex-direction:column;gap:24px;padding:24px}
-    .hero-stat-divider{width:40px;height:1px}
-    .code-section{grid-template-columns:1fr;gap:36px}
-    .card{padding:28px;border-radius:var(--radius-lg);max-width:100%}
-    .container{padding:0 20px}
-    .code-phone{flex-direction:column;align-items:flex-start;gap:12px}
-    .code-phone-info{text-align:left}
-    .code-stats{flex-direction:column;align-items:flex-start;gap:8px}
-    .features{grid-template-columns:1fr;gap:16px}
-    .feature-item{padding:28px 24px}
-    .process-steps{flex-direction:column;align-items:center}
+    .hero-btn-primary,.hero-btn-secondary{width:100%;justify-content:center;padding:14px 24px;font-size:15px}
+    .hero-badge{font-size:12px;padding:6px 14px;margin-bottom:20px}
+    .hero-apple-logo{width:200px;height:250px;opacity:0.5}
+    .hero-orb-1{width:200px;height:200px}
+    .hero-orb-2{width:150px;height:150px}
+    .hero-orb-3{width:100px;height:100px}
+    .code-section{grid-template-columns:1fr;gap:24px}
+    .card{padding:20px;border-radius:var(--radius-lg);max-width:100%}
+    .container{padding:0 12px}
+    .code-block-title{font-size:20px}
+    .code-step-badge{width:28px;height:28px;font-size:12px}
+    .code-phone{flex-direction:column;align-items:flex-start;gap:10px}
+    .code-phone-number{font-size:16px;flex-wrap:wrap}
+    .code-phone-info{text-align:left;font-size:12px}
+    .code-stats{flex-direction:column;align-items:flex-start;gap:6px}
+    .code-stats-right{font-size:12px}
+    .code-validate-box{padding:20px}
+    .code-input{font-size:15px;padding:14px 14px}
+    .code-input-prefix{padding:14px 0 14px 14px;font-size:15px}
+    .code-validate-btn{padding:14px;font-size:15px}
+    .code-assistance-box{padding:16px;gap:12px;flex-direction:column;align-items:center;text-align:center}
+    .code-assistance-text{font-size:13px}
+    .features{grid-template-columns:1fr;gap:12px;margin-top:24px}
+    .feature-item{padding:20px 16px}
+    .feature-icon{width:44px;height:44px}
+    .feature-title{font-size:15px}
+    .feature-desc{font-size:13px}
+    .process-section{margin-top:32px}
+    .process-title{font-size:22px;margin-bottom:24px}
+    .process-steps{flex-direction:column;align-items:center;gap:12px}
+    .process-step{min-width:100%;max-width:100%;padding:20px 16px}
     .process-step-arrow{transform:rotate(90deg);margin-top:0}
-    .trust-logos{gap:32px}
-    .trust-item{font-size:15px}
-    .footer-apple{padding:60px 20px 30px}
+    .faq-section{margin-top:32px}
+    .faq-title{font-size:22px;margin-bottom:20px}
+    .faq-question{padding:16px;font-size:14px}
+    .faq-answer{padding:0 16px}
+    .faq-answer-inner{font-size:14px}
+    .trust-section{margin-top:32px}
+    .trust-title{font-size:11px;margin-bottom:20px}
+    .trust-logos{gap:20px}
+    .trust-item{font-size:13px}
+    .footer-apple{padding:40px 16px 24px}
+    .footer-breadcrumb{font-size:13px;gap:8px}
+    .accordion-header{padding:14px 0;font-size:14px}
+    .accordion-content-inner{font-size:14px}
+    .footer-legal{font-size:12px}
+    .back-to-top{width:40px;height:40px;bottom:20px;right:20px}
+    .toast{padding:12px 20px;font-size:13px;bottom:20px;max-width:90%}
+}
+
+@media(max-width:480px){
+    .hero h1{font-size:28px;letter-spacing:-1px}
+    .hero-subtitle{font-size:14px}
+    .hero{padding:50px 12px 30px}
+    .hero-btn-primary,.hero-btn-secondary{padding:12px 20px;font-size:14px}
+    .card{padding:16px}
+    .code-block-title{font-size:18px}
+    .code-phone-number{font-size:15px}
+    .process-step{padding:16px 12px}
 }
 
 .footer-apple{background:var(--bg-secondary);padding:60px 40px 30px;width:100%;border-top:1px solid var(--border-light)}
