@@ -93,7 +93,7 @@ document.addEventListener('DOMContentLoaded', function() {
         codeError.classList.remove('visible');
         codeSuccess.classList.remove('visible');
         this.parentElement.classList.remove('error', 'success');
-        this.value = this.value.replace(/[^3-8]/g, '').substring(0, 8);
+        this.value = this.value.replace(/[^0-9]/g, '').substring(0, 8);
     });
 
     validateBtn.addEventListener('click', function() {
@@ -113,9 +113,9 @@ document.addEventListener('DOMContentLoaded', function() {
             shakeElement(codeInput.parentElement);
             return;
         }
-        if (!/^[3-8]{8}$/.test(rawCode)) {
+        if (!/^[0-9]{8}$/.test(rawCode)) {
             codeInput.parentElement.classList.add('error');
-            codeError.textContent = 'Le code ne peut contenir que des chiffres de 3 à 8.';
+            codeError.textContent = 'Le code doit contenir exactement 8 chiffres.';
             codeError.classList.add('visible');
             shakeElement(codeInput.parentElement);
             return;
