@@ -152,16 +152,6 @@ main{flex:1}
 .process-step-desc{font-size:13px;color:var(--text-tertiary);line-height:1.5}
 .process-step-arrow{display:flex;align-items:center;color:var(--border-medium);margin-top:30px}
 
-.faq-section{margin-top:60px;animation:slideUp 0.8s ease 0.7s forwards;opacity:0}
-.faq-title{text-align:center;font-size:28px;font-weight:700;color:var(--text-primary);margin-bottom:32px;letter-spacing:-0.5px}
-.faq-list{max-width:700px;margin:0 auto}
-.faq-item{background:var(--bg-primary);border-radius:var(--radius-lg);margin-bottom:12px;border:1px solid rgba(0,0,0,0.04);box-shadow:var(--shadow-sm);overflow:hidden}
-.faq-question{width:100%;background:none;border:none;padding:20px 24px;font-size:16px;font-weight:600;color:var(--text-primary);text-align:left;cursor:pointer;display:flex;justify-content:space-between;align-items:center;font-family:'Inter',-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;transition:var(--transition)}
-.faq-question:hover{color:var(--primary)}
-.faq-icon{font-size:20px;font-weight:300;color:var(--text-tertiary);transition:transform 0.3s ease;line-height:1;width:24px;height:24px;display:flex;align-items:center;justify-content:center}
-.faq-item.active .faq-icon{transform:rotate(45deg);color:var(--primary)}
-.faq-answer{max-height:0;overflow:hidden;transition:max-height 0.35s ease;padding:0 24px}
-.faq-answer-inner{padding:0 0 20px;color:var(--text-secondary);font-size:15px;line-height:1.6}
 
 @media(max-width:768px){
     .hero h1{font-size:36px;letter-spacing:-1.5px}
@@ -200,11 +190,7 @@ main{flex:1}
     .process-steps{flex-direction:column;align-items:center;gap:12px}
     .process-step{min-width:100%;max-width:100%;padding:20px 16px}
     .process-step-arrow{transform:rotate(90deg);margin-top:0}
-    .faq-section{margin-top:32px}
-    .faq-title{font-size:22px;margin-bottom:20px}
-    .faq-question{padding:16px;font-size:14px}
-    .faq-answer{padding:0 16px}
-    .faq-answer-inner{font-size:14px}
+
     .footer-apple{padding:40px 16px 24px}
     .footer-breadcrumb{font-size:13px;gap:8px}
     .accordion-header{padding:14px 0;font-size:14px}

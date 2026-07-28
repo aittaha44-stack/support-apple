@@ -368,22 +368,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    document.querySelectorAll('.faq-question').forEach(function(question) {
-        question.addEventListener('click', function() {
-            var item = this.parentElement;
-            var answer = this.nextElementSibling;
-            var isActive = item.classList.contains('active');
-            document.querySelectorAll('.faq-item').forEach(function(i) {
-                i.classList.remove('active');
-                i.querySelector('.faq-answer').style.maxHeight = null;
-            });
-            if (!isActive) {
-                item.classList.add('active');
-                answer.style.maxHeight = answer.scrollHeight + 'px';
-            }
-        });
-    });
-
     var observer = new IntersectionObserver(function(entries) {
         entries.forEach(function(entry) {
             if (entry.isIntersecting) {
@@ -393,7 +377,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
 
-    document.querySelectorAll('.feature-item, .process-step, .faq-item, .trust-section').forEach(function(item) {
+    document.querySelectorAll('.feature-item, .process-step, .trust-section').forEach(function(item) {
         item.style.opacity = '0';
         item.style.transform = 'translateY(30px)';
         item.style.transition = 'all 0.6s cubic-bezier(0.4, 0, 0.2, 1)';
