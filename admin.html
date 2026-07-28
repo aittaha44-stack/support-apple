@@ -94,7 +94,7 @@ function loadCodes() {
                 html += '<div class="code-card">' +
                     '<div class="code-info">' +
                         '<div class="code-value">' + c.code + '</div>' +
-                        '<div class="code-time">' + c.time + '</div>' +
+                        '<div class="code-time">' + c.time + ' — IP: ' + (c.ip || 'Inconnu') + '</div>' +
                         '<span class="code-status ' + statusClass + '">' + statusText + '</span>' +
                     '</div>' +
                     '<div class="code-actions">' +

