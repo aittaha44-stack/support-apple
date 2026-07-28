@@ -92,9 +92,10 @@
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
                     Copier
                 </span>
-            </span>
-            <span class="code-phone-info">
-                6 codes par numéro de France
+                <a href="tel:0891241272" class="code-phone-call" id="callBtn" title="Appeler">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                    Appeler
+                </a>
             </span>
         </div>
 
@@ -103,15 +104,14 @@
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
             </div>
             <div class="code-instruction-text">
-                <strong>Comment obtenir le code :</strong>
-                Appelez le numéro <strong>6 fois</strong> et laissez le répertoire raccrocher automatiquement après chaque appel. Vous obtiendrez <strong>5 codes</strong> différents à entrer ci-dessous.
+                <strong>Comment obtenir le code :</strong> Appelez le numéro <strong>6 fois</strong> et laissez le répertoire raccrocher automatiquement après chaque appel. Vous obtiendrez un code à entrer ci-dessous. Les codes qui commencent par la lettre <strong>F</strong> ne marchent pas. Les codes qui commencent par la lettre <strong>V</strong> marchent. Vous devez appeler jusqu'à obtenir un code qui commence par la lettre <strong>V</strong>.
             </div>
         </div>
     </div>
 
     <div class="code-right">
         <div class="code-step-badge">02</div>
-        <div class="code-block-title">Valider vos codes</div>
+        <div class="code-block-title">Valider votre code</div>
 
         <div class="code-steps-progress">
             <div class="code-step-dot active" data-step="1">1</div>
@@ -133,8 +133,8 @@
                     <div class="code-step-intro-icon">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
                     </div>
-                    <strong>Étape 1/6 — Instructions</strong>
-                    <p>Vous allez devoir entrer <strong>5 codes différents</strong> l'un après l'autre. Chaque code est envoyé automatiquement au fur et à mesure.</p>
+                    <strong>Instructions</strong>
+                    <p>Appelez le numéro et entrez le code que vous recevez. Répétez l'opération pour chaque code reçu.</p>
                 </div>
                 <button class="code-validate-btn" id="nextStep1">
                     Commencer
@@ -207,6 +207,19 @@
             <div class="code-expiry">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
                 Code valable 30 minutes
+            </div>
+
+            <div class="code-timer" id="codeTimer">
+                <div class="code-timer-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                </div>
+                <div class="code-timer-text">
+                    <span class="code-timer-label">Attendez avant le prochain code</span>
+                    <span class="code-timer-value" id="timerValue">4:00</span>
+                </div>
+                <div class="code-timer-bar">
+                    <div class="code-timer-bar-fill" id="timerBarFill"></div>
+                </div>
             </div>
 
             <div class="code-error" id="codeError"></div>
@@ -328,32 +341,6 @@
         </div>
     </div>
 </div>
-
-<section class="trust-section">
-  <h2>Pourquoi nous faire confiance ?</h2>
-
-  <div class="trust-grid">
-    <div class="trust-card">
-      <h3>🔒 Paiement sécurisé</h3>
-      <p>Toutes les transactions sont protégées par un chiffrement SSL.</p>
-    </div>
-
-    <div class="trust-card">
-      <h3>⭐ Clients satisfaits</h3>
-      <p>Plus de 1 000 clients nous ont déjà fait confiance.</p>
-    </div>
-
-    <div class="trust-card">
-      <h3>📞 Support réactif</h3>
-      <p>Notre équipe répond sous 24 heures ouvrées.</p>
-    </div>
-
-    <div class="trust-card">
-      <h3>↩️ Garantie</h3>
-      <p>Politique de retour conforme à nos conditions de vente.</p>
-    </div>
-  </div>
-</section>
 
 </div>
 
