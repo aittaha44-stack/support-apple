@@ -304,10 +304,9 @@ header.scrolled {
 
 /* ==================== CODE SECTION ==================== */
 .code-section {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 40px;
-    align-items: start;
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
     position: relative;
     z-index: 1;
 }
